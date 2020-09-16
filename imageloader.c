@@ -7,7 +7,7 @@
 ** AUTHOR:      Dan Garcia  -  University of California at Berkeley
 **              Copyright (C) Dan Garcia, 2020. All rights reserved.
 **              Justin Yokota - Starter Code
-**				YOUR NAME HERE
+**				Frank Warren
 **
 **
 ** DATE:        2020-08-15
@@ -48,11 +48,12 @@ Image *readData(char *filename) {
 void writeData(Image *image) {
 	printf("P3\n%d %d\n255\n", image->cols, image->rows);
 	for (int row=0; row < image->rows; row++) {
-		for (int col=0; col < image->cols - 1; col++) {
-			Color color = (*image->image)[row+col];
-			printf("%*u %*u %*u   ", 3, color.R, 3, color.G, 3, color.B);
-			if (col == image->cols - 1) {
+		for (int col=0; col < image->cols-1; col++) {
+			Color color = (*image->image)[row * image->cols + col];
+			printf("%*hhu %*hhu %*hhu   ", 3, color.R, 3, color.G, 3, color.B);
+			if (col == image->cols - 2) {
 				printf("%*hhu %*hhu %*hhu\n", 3, color.R, 3, color.G, 3, color.B);
+				col++;
 			}
 		}
 	}
