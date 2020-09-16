@@ -47,13 +47,15 @@ Image *readData(char *filename) {
 //Given an image, prints to stdout (e.g. with printf) a .ppm P3 file with the image's data.
 void writeData(Image *image) {
 	printf("P3\n%d %d\n255\n", image->cols, image->rows);
+	Color *ptr = (*image->image);
 	for (int row=0; row < image->rows; row++) {
 		for (int col=0; col < image->cols-1; col++) {
-			Color color = (*image->image)[row * image->cols + col];
+			Color color = ptr[row * image->cols + col];
 			printf("%*hhu %*hhu %*hhu   ", 3, color.R, 3, color.G, 3, color.B);
 			if (col == image->cols - 2) {
-				printf("%*hhu %*hhu %*hhu\n", 3, color.R, 3, color.G, 3, color.B);
 				col++;
+				color = (*image->image)[row * image->cols + col];
+				printf("%*hhu %*hhu %*hhu\n", 3, color.R, 3, color.G, 3, color.B);
 			}
 		}
 	}
