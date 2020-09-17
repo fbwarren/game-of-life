@@ -31,14 +31,23 @@ Image *readData(char *filename) {
 	fscanf(fp, "%*s %i %i %*s", &cols, &rows);
 	image->cols = cols;
 	image->rows = rows; 	
-	image->image = malloc(sizeof(Color**));
-	*(image->image) = calloc(cols*rows, sizeof(Color));	
-	if (!*(image->image)) { return NULL; }
-	for (int i=0; i < cols*rows; i++) {
-		uint8_t R, G, B;
-		fscanf(fp, "%hhu %hhu %hhu", &R, &G, &B);
-		Color color = {R, G, B};
-		(*image->image)[i] = color;
+	image->image = calloc(rows, sizeof(Color*)); 		// Pointers to rows
+	if (!(image->image)) { exit(-1); }
+	uint8_t R, G, B;
+	for (int row=0; row < rows; row++) {
+		(image->image)[row] = calloc(cols, sizeof(Color));  // Pointers to column entries
+		for (int col=0; col < cols; col++) {
+			fscanf(fp, "%hhu %hhu %hhu", &R, &G, &B);
+			Color color = {R, G, B};
+			image->image[row][col] = color;
+		}
+		// uint8_t R, G, B;
+		// fscanf(fp, "%hhu %hhu %hhu", &R, &G, &B);
+		// // Color color = {R, G, B};
+		// Color *color = (*image->image)[i];
+		// color->R = R;
+		// color->G = G;
+		// color->B = B;
 	}
 	fclose(fp);
 	return image;
@@ -47,14 +56,14 @@ Image *readData(char *filename) {
 //Given an image, prints to stdout (e.g. with printf) a .ppm P3 file with the image's data.
 void writeData(Image *image) {
 	printf("P3\n%d %d\n255\n", image->cols, image->rows);
-	Color *ptr = (*image->image);
+	Color **colors = (image->image);
 	for (int row=0; row < image->rows; row++) {
 		for (int col=0; col < image->cols-1; col++) {
-			Color color = ptr[row * image->cols + col];
+			Color color = colors[row][col];
 			printf("%*hhu %*hhu %*hhu   ", 3, color.R, 3, color.G, 3, color.B);
 			if (col == image->cols - 2) {
 				col++;
-				color = (*image->image)[row * image->cols + col];
+				color = colors[row][col];
 				printf("%*hhu %*hhu %*hhu\n", 3, color.R, 3, color.G, 3, color.B);
 			}
 		}
@@ -63,7 +72,9 @@ void writeData(Image *image) {
 
 //Frees an image
 void freeImage(Image *image) {
-	free(*image->image);
+	for (int row=0; row < image->rows; row++) {
+		free(image->image[row]);
+	}
 	free(image->image);
 	free(image);
 }

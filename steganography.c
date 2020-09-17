@@ -21,13 +21,22 @@
 //Determines what color the cell at the given row/col should be. This should not affect Image, and should allocate space for a new Color.
 Color *evaluateOnePixel(Image *image, int row, int col)
 {
-	uint8_t blue = (*image->image)[(row * image->cols) + col].B;  // Get the blue value from the image
-	blue &= 1; 
-	blue = ~blue + 1;
-	Color *color = calloc(1, sizeof(Color));
-	Color temp = {blue, blue, blue};
-	*color = temp;
-	return color;
+	Color color = (image->image)[row][col];
+	Color *ptr;
+	uint8_t blue = color.B;
+	blue &= 1;				// Grab LSB
+	blue = ~blue + 1;		// Set to 0 if LSB==0, else blue=255
+	ptr = calloc(1, sizeof(Color));  // color now points to new Color space.
+	ptr->R = ptr->G = ptr->B = blue; 
+	return ptr;
+
+	// uint8_t blue = (*image->image)[(row * image->cols) + col].B;  // Get the blue value from the image
+	// blue &= 1; 
+	// blue = ~blue + 1;
+	// Color *color = calloc(1, sizeof(Color));
+	// Color temp = {blue, blue, blue};
+	// *color = temp;
+	// return color;
 }
 
 //Given an image, creates a new image extracting the LSB of the B channel.
@@ -35,14 +44,30 @@ Image *steganography(Image *image)
 {
 	Image *newImage = malloc(sizeof(Image));
 	*newImage = *image;
-	*(newImage->image) = calloc(image->cols*image->rows, sizeof(Color));
-	for (int r=0; r < image->rows; r++) {
-		for (int c=0; c < image->rows; c++) {
-			(newImage->image)[c+r] = evaluateOnePixel(image, r, c);
-		}
+	//newImage->cols = image->cols;
+	//newImage->rows = newImage->rows;
+	//*(newImage->image) = calloc(image->cols * image->rows, sizeof(Color));
+	//if (!*(newImage->image)) { exit(-1); }
+		// Color *pixel = evaluateOnePixel(image, i/(newImage->cols), i%(newImage->rows));
+	for (int r=0; r <= image->rows-1; r++) {
+		for (int c=0; c <= image->cols-1; c++) {
+	 		Color *pixel = evaluateOnePixel(image, r, c);
+			(newImage->image)[r][c] = *pixel; 
+			free(pixel);
+	 	}
 	}
-	free(image);
+		// (*image->image)[i] = *pixel;
 	return newImage;
+	// Image *newImage = malloc(sizeof(Image));
+	// *newImage = *image;
+	// *(newImage->image) = calloc(image->cols*image->rows, sizeof(Color));
+	// for (int r=0; r < image->rows; r++) {
+	// 	for (int c=0; c < image->rows; c++) {
+	// 		(newImage->image)[c+r] = evaluateOnePixel(image, r, c);
+	// 	}
+	// }
+	// free(image);
+	// return newImage;
 }
 
 /*
@@ -65,7 +90,7 @@ int main(int argc, char **argv)
 	Image *newImage = steganography(image);
 	if (newImage == NULL) return -1;
 	writeData(newImage);
+	//freeImage(image);
 	freeImage(newImage);
-	//freeImage(newImage);
 	return 0;
 }
