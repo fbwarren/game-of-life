@@ -41,13 +41,6 @@ Image *readData(char *filename) {
 			Color color = {R, G, B};
 			image->image[row][col] = color;
 		}
-		// uint8_t R, G, B;
-		// fscanf(fp, "%hhu %hhu %hhu", &R, &G, &B);
-		// // Color color = {R, G, B};
-		// Color *color = (*image->image)[i];
-		// color->R = R;
-		// color->G = G;
-		// color->B = B;
 	}
 	fclose(fp);
 	return image;

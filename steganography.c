@@ -7,7 +7,7 @@
 ** AUTHOR:      Dan Garcia  -  University of California at Berkeley
 **              Copyright (C) Dan Garcia, 2020. All rights reserved.
 **				Justin Yokota - Starter Code
-**				YOUR NAME HERE
+**				Frank Warren
 **
 ** DATE:        2020-08-23
 **
@@ -29,14 +29,6 @@ Color *evaluateOnePixel(Image *image, int row, int col)
 	ptr = calloc(1, sizeof(Color));  // color now points to new Color space.
 	ptr->R = ptr->G = ptr->B = blue; 
 	return ptr;
-
-	// uint8_t blue = (*image->image)[(row * image->cols) + col].B;  // Get the blue value from the image
-	// blue &= 1; 
-	// blue = ~blue + 1;
-	// Color *color = calloc(1, sizeof(Color));
-	// Color temp = {blue, blue, blue};
-	// *color = temp;
-	// return color;
 }
 
 //Given an image, creates a new image extracting the LSB of the B channel.
@@ -44,11 +36,6 @@ Image *steganography(Image *image)
 {
 	Image *newImage = malloc(sizeof(Image));
 	*newImage = *image;
-	//newImage->cols = image->cols;
-	//newImage->rows = newImage->rows;
-	//*(newImage->image) = calloc(image->cols * image->rows, sizeof(Color));
-	//if (!*(newImage->image)) { exit(-1); }
-		// Color *pixel = evaluateOnePixel(image, i/(newImage->cols), i%(newImage->rows));
 	for (int r=0; r <= image->rows-1; r++) {
 		for (int c=0; c <= image->cols-1; c++) {
 	 		Color *pixel = evaluateOnePixel(image, r, c);
@@ -56,18 +43,7 @@ Image *steganography(Image *image)
 			free(pixel);
 	 	}
 	}
-		// (*image->image)[i] = *pixel;
 	return newImage;
-	// Image *newImage = malloc(sizeof(Image));
-	// *newImage = *image;
-	// *(newImage->image) = calloc(image->cols*image->rows, sizeof(Color));
-	// for (int r=0; r < image->rows; r++) {
-	// 	for (int c=0; c < image->rows; c++) {
-	// 		(newImage->image)[c+r] = evaluateOnePixel(image, r, c);
-	// 	}
-	// }
-	// free(image);
-	// return newImage;
 }
 
 /*
