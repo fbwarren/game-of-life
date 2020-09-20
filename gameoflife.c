@@ -24,25 +24,23 @@ uint8_t evaluateChannel(Image *image, int row, int col, uint32_t rule, uint8_t c
 {
 	Color cell = (image->image)[row][col]; // Get the original cell
 	Color neighbor;
-	unsigned long cellFields = cell.R << 16 + cell.G << 8 + cell.B; // Combine all its color fields in one number
+	unsigned long cellFields = (cell.R << 16) + (cell.G << 8) + (cell.B); // Combine all its color fields in one number
 	unsigned long neighborFields;
 	uint8_t cellField = (cellFields >> channel) & 1; // Determine if cell is dead or alive
 	uint8_t neighborField;
-	uint8_t neighbors = -1; // Account for counting cell as a neighbor
+	int8_t neighbors = 0; // Account for counting cell as a neighbor
 	for (int r = 1; r >= -1; r--)
 	{ // Iterate through neighbors
 		for (int c = 1; c >= -1; c--)
 		{
-			neighbor = (image->image)[(row - r) % (image->rows)][(col + c) % (image->cols)];
-			neighborFields = neighbor.R << 16 + neighbor.G << 8 + neighbor.B;
+			neighbor = (image->image)[(row + image->rows - r) % (image->rows)][(col + image->cols - c) % (image->cols)];
+			neighborFields = (neighbor.R << 16) + (neighbor.G << 8) + (neighbor.B);
 			neighborField = (neighborFields >> channel) & 1;
-			if (cellField == neighborField)
-			{
-				neighbors++;
-			} // If both cell and neighbor are "alive" at same channel
+			if (neighborField) { neighbors++; } // Neighbor is "alive" at channel
 		}
 	}
-	rule = rule << (cellField * 9); // Shift to correct set of rules depending on if cell is alive
+	if (cellField) {neighbors--;}
+	rule = rule >> (cellField * 9); // Shift to correct set of rules depending on if cell is alive
 	return (rule >> neighbors) & 1;
 }
 
@@ -51,7 +49,7 @@ uint8_t evaluateChannel(Image *image, int row, int col, uint32_t rule, uint8_t c
 //and the left column as adjacent to the right column.
 Color *evaluateOneCell(Image *image, int row, int col, uint32_t rule) {
 	uint32_t color = 0;
-	for (int i=0; i<23; i++) {
+	for (int i=0; i<24; i++) {
 		color = color | (evaluateChannel(image, row, col, rule, i)<<i);
 	}
 	Color *ptr = (Color*) calloc(1, sizeof(Color));
@@ -67,10 +65,10 @@ Image *life(Image *image, uint32_t rule)
 {
 	Image *newImage = (Image*) malloc(sizeof(Image));
 	*newImage = *image;
-	for (int r = 0; r <= image->rows - 1; r++)
-	{
-		for (int c = 0; c <= image->cols - 1; c++)
-		{
+	newImage->image = calloc(image->rows, sizeof(Color*));
+	for (int r = 0; r <= image->rows - 1; r++) {
+		(newImage->image)[r] = calloc(image->cols, sizeof(Color));
+		for (int c = 0; c <= image->cols - 1; c++) {
 			Color *pixel = evaluateOneCell(image, r, c, rule);
 			(newImage->image)[r][c] = *pixel;
 			free(pixel);
@@ -101,7 +99,8 @@ int main(int argc, char **argv)
 			   	"filename is an ASCII PPM file (type P3 with maximum value 255.\n"
 				"rule is a hex number beginning with 0x; Life is 0x1808.\n");
 	}
-	uint32_t rule = atoi(argv[3]);
+	//uint32_t rule = atoi(argv[3]);
+	uint32_t rule = 6152; 				//TODO: NOT HARDCODE THIS!!
 	Image *image = readData(argv[1]);
 	Image *iteration = life(image, rule);
 	writeData(iteration);
