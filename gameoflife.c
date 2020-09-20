@@ -105,4 +105,5 @@ int main(int argc, char **argv)
 	Image *iteration = life(image, rule);
 	writeData(iteration);
 	freeImage(iteration);
+	freeImage(image);
 }
