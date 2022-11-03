@@ -2,7 +2,7 @@
 
 This is a simple implementation of [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life).  
 To run it, clone this project and run `./frames.csh <imagename> <rule> <frames>`  
-The image must be a [ppm](https://netpbm.sourceforge.net/doc/ppm.html) format file.  
+The image must be a [ppm](https://netpbm.sourceforge.net/doc/ppm.html) format file. There's some examples in `./testInputs`   
 Here's how rule is defined, using the rule `0x1808` as an example:
 <table>
   <tbody>
